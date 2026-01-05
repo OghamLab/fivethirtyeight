@@ -20,7 +20,7 @@ import com.ola.fivethirtyeight.model.TechItemEntity
 import com.ola.fivethirtyeight.model.WorldItemEntity
 
 
-@Database(entities = [FeedItemEntity::class , PoliticsItemEntity::class, WorldItemEntity::class, BusinessItemEntity::class, SportsItemEntity::class, TechItemEntity::class, HealthItemEntity::class, FiveThirtyEightItemEntity::class], version = 3,
+@Database(entities = [FeedItemEntity::class , PoliticsItemEntity::class, WorldItemEntity::class, BusinessItemEntity::class, SportsItemEntity::class, TechItemEntity::class, HealthItemEntity::class, FiveThirtyEightItemEntity::class], version = 5,
     exportSchema = false)
 abstract class NewsDatabase: RoomDatabase() {
     abstract fun feedItemDao(): FeedItemDao
@@ -32,9 +32,11 @@ abstract class NewsDatabase: RoomDatabase() {
     abstract fun healthItemDao(): HealthItemDao
     abstract fun fiveThirtyEightItemDao(): FiveThirtyEightItemDao
 
-
-
-
-
-
 }
+
+
+
+
+
+
+

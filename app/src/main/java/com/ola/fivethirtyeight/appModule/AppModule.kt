@@ -33,6 +33,7 @@ import com.ola.fivethirtyeight.dataSource.WorldDataSource
 import com.ola.fivethirtyeight.dataSource.WorldDataSourceImpl
 import com.ola.fivethirtyeight.database.NewsDatabase
 import com.ola.fivethirtyeight.datastore.SyncPreferences
+import com.ola.fivethirtyeight.migration.DatabaseMigrations
 import com.ola.fivethirtyeight.repository.BusinessFeedRepository
 import com.ola.fivethirtyeight.repository.FiveThirtyEightFeedRepository
 import com.ola.fivethirtyeight.repository.HealthFeedRepository
@@ -81,14 +82,30 @@ object AppModule {
     }
 
 
-    @Singleton
+   /* @Singleton
     @Provides
     fun providesTopStoriesRepository(topStoriesDataSource: TopStoriesDataSource,
-        feedItemDao: FeedItemDao, syncPreferences: SyncPreferences
+        feedItemDao: FeedItemDao,  refreshDao: FeedRefreshDao, database: NewsDatabase
     ): TopStoriesFeedRepository {
-        return TopStoriesFeedRepository (topStoriesDataSource, feedItemDao, syncPreferences)
+        return TopStoriesFeedRepository (topStoriesDataSource, feedItemDao, refreshDao, database)
 
-    }
+    }*/
+
+     @Singleton
+        @Provides
+        fun providesTopStoriesRepository(topStoriesDataSource: TopStoriesDataSource,
+                                         feedItemDao: FeedItemDao, syncPreferences: SyncPreferences, newsDatabase: NewsDatabase
+        ): TopStoriesFeedRepository {
+            return TopStoriesFeedRepository(topStoriesDataSource, feedItemDao, newsDatabase, syncPreferences)
+
+        }
+
+
+
+
+
+
+
 
 
     @Singleton
@@ -203,7 +220,11 @@ object AppModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context) =
-        Room.databaseBuilder(context, NewsDatabase::class.java, "news_db").build()
+        Room.databaseBuilder(context, NewsDatabase::class.java, "news_db")
+            .addMigrations(DatabaseMigrations.MIGRATION_4_5)
+
+
+            .build()
 
 
 

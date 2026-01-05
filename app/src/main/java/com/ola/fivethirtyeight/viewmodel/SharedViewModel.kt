@@ -40,7 +40,7 @@ class SharedViewModel @Inject constructor(
     private val sportsFeedRepository: SportsFeedRepository,
     private val healthFeedRepository: HealthFeedRepository,
     private val fiveThirtyEightRepository: FiveThirtyEightFeedRepository,
-    savedStateHandle: SavedStateHandle,
+  private val savedStateHandle: SavedStateHandle,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -76,6 +76,16 @@ class SharedViewModel @Inject constructor(
     fun selectFeedItem(item: FeedItem) {
         _selectedFeedItem.value = item
     }
+
+    /*val topStoriesPaging by lazy {
+        topStoriesFeedRepository.pagingTopStories().cachedIn(viewModelScope)
+    }*/
+
+    val topStoriesPaging =
+        topStoriesFeedRepository
+            .pagingTopStories()
+            .cachedIn(viewModelScope)
+
 
     // --- Scroll position ---
     private val _firstVisibleItemIndex = MutableStateFlow(0)
@@ -160,10 +170,10 @@ class SharedViewModel @Inject constructor(
     //val topStoriesState: StateFlow<ResourceState<List<FeedItem>>> = _topStoriesState
 
 
-    val topStoriesPaging =
+    /*val topStoriesPaging =
         topStoriesFeedRepository
             .pagingTopStories()
-            .cachedIn(viewModelScope)
+            .cachedIn(viewModelScope)*/
 
     /*val topStoriesPaging = Pager(
         config = PagingConfig(pageSize = 20),
@@ -175,6 +185,32 @@ class SharedViewModel @Inject constructor(
 
     private val _hasLoadedOnceTop = MutableStateFlow(false)
     val hasLoadedOnceTop: StateFlow<Boolean> = _hasLoadedOnceTop
+
+    enum class FeedTab { TOP, POLITICS, WORLD, BUSINESS, TECH, SPORTS, HEALTH, FIVE_THIRTY_EIGHT }
+    data class ScrollStateSnapshot(val index: Int = 0, val offset: Int = 0)
+
+    /*private val _scrollStates = MutableStateFlow<Map<FeedTab, ScrollStateSnapshot>>(emptyMap())
+    val scrollStates: StateFlow<Map<FeedTab, ScrollStateSnapshot>> = _scrollStates
+*/
+    private val _scrollStates =
+        savedStateHandle.getStateFlow("scrollStates", emptyMap<FeedTab, ScrollStateSnapshot>())
+
+    val scrollStates: StateFlow<Map<FeedTab, ScrollStateSnapshot>> = _scrollStates
+
+    fun saveScrollPosition(tab: FeedTab, index: Int, offset: Int) {
+        val updated = _scrollStates.value + (tab to ScrollStateSnapshot(index, offset))
+        savedStateHandle["scrollStates"] = updated
+    }
+
+
+
+
+    fun scrollStateFor(tab: FeedTab): ScrollStateSnapshot =
+        _scrollStates.value[tab] ?: ScrollStateSnapshot()
+
+
+
+
 
 
     // --- Init ---
@@ -218,13 +254,13 @@ class SharedViewModel @Inject constructor(
         val hasFetchedTopStories =
             savedStateHandle.get<Boolean>("hasFetchedTopStories") == true
 
-        if (!hasFetchedTopStories) {
+       /* if (!hasFetchedTopStories) {
             viewModelScope.launch {
                 topStoriesFeedRepository.syncTopStories()
             }
             savedStateHandle["hasFetchedTopStories"] = true
         }
-
+*/
 
         val hasFetchedOtherFeeds =
             savedStateHandle.get<Boolean>("hasFetchedOtherFeeds") == true
@@ -242,6 +278,11 @@ class SharedViewModel @Inject constructor(
 
 
     }
+
+
+
+
+
 
 
     /*private fun observeTopStoriesDb() {

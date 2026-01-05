@@ -1,6 +1,7 @@
 package com.ola.fivethirtyeight.dataSource
 
 import com.ola.fivethirtyeight.api.ApiService
+import com.ola.fivethirtyeight.config.FeedConfig
 import com.ola.fivethirtyeight.model.FeedItem
 import com.ola.fivethirtyeight.parser.parseRss
 import com.ola.fivethirtyeight.utils.extractGoogleImage
@@ -59,7 +60,28 @@ class BusinessDataSourceImpl @Inject constructor(
             titleTransformer = titleTransform
         )
     }
+
+
+
+    private suspend fun fetchFeed(feed: FeedConfig): List<FeedItem> {
+        val response = apiService.getFeedItems(feed.url)
+        if (!response.isSuccessful) return emptyList()
+
+        return parseRss(
+            xml = response.body().toString(),
+            imageExtractor = feed.imageExtractor,
+            titleTransformer = feed.titleTransformer
+        )
+    }
+
+
 }
+
+
+
+
+
+
 
 
 /*

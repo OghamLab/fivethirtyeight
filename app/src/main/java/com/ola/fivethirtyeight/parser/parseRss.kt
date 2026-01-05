@@ -38,14 +38,15 @@ private fun isValidItem(
 private fun normalizeLink(link: String): String =
     link.substringBefore("?").trim()
 
-
-private fun extractImage(element: Element): String {
+ fun extractImage(element: Element): String {
     return element.getElementsByTag("media:thumbnail").first()?.attr("url")
         ?: element.getElementsByTag("media:content").first()?.attr("url")
         ?: element.select("enclosure[url]").attr("url")
-        ?: element.select("content|encoded img").first()?.attr("src")
-        ?: ""
 }
+
+
+
+
 
 
 fun parseRss(
@@ -73,9 +74,7 @@ fun parseRss(
         val link = normalizeLink(
             element.selectFirst("link")?.text().orEmpty()
         )
-
         if (!isValidItem(title, link, timeInMil)) continue
-
         val image = imageExtractor(element)
 
         result.add(
@@ -98,50 +97,3 @@ fun parseRss(
         .sortedByDescending { it.timeInMil }
 }
 
-
-/*
-fun parseRss(
-    xml: String,
-    imageExtractor: (Element) -> String = { "" },
-    titleTransformer: (String) -> String = { it }
-): List<FeedItem> {
-
-    val doc = Jsoup.parse(xml, "", Parser.xmlParser())
-    val items = doc.select("item")
-
-    val result = mutableListOf<FeedItem>()
-
-    for (element in items) {
-        val title = titleTransformer(
-            element.select("title").text()
-        )
-
-        val description = Jsoup
-            .parse(element.select("description").text())
-            .text()
-
-        val pubDate = element.select("pubDate").text()
-       // val timeInMil = RSS_DATE_FORMAT.parse(pubDate)?.time ?: continue
-        val timeInMil = parsePubDate(pubDate) ?: continue
-
-        val link = element.select("link").text()
-        val image = imageExtractor(element)
-
-        result.add(
-            FeedItem(
-                title,
-                description,
-                "",
-                "",
-                pubDate,
-                image,
-                link,
-                "",
-                timeInMil
-            )
-        )
-    }
-
-    return result
-}
-*/

@@ -18,10 +18,11 @@ interface SportsItemDao: BaseFeedDao<SportsItemEntity> {
 
 
     /** UI: observe a single feed item by link */
-    @Query("SELECT * FROM sports_items WHERE link = :link ORDER BY timeInMil DESC")
-    override fun getFeedsBySource(link: String): Flow<List<SportsItemEntity>>
+    //@Query("SELECT * FROM sports_items WHERE link = :link ORDER BY timeInMil DESC")
+   // override fun getFeedsBySource(link: String): Flow<SportsItemEntity?>
 
-
+    @Query("SELECT * FROM sports_items WHERE link = :link LIMIT 1")
+    override fun getItemByLink(link: String): Flow<SportsItemEntity?>
     /** UI: observe saved items */
     @Query("SELECT * FROM sports_items WHERE isSavedForLater = 1 ORDER BY publishedAt DESC")
     override fun getSavedItems(): Flow<List<SportsItemEntity>>

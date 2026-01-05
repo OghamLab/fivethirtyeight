@@ -1,7 +1,6 @@
 package com.ola.fivethirtyeight.worker
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -17,6 +16,74 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
 import kotlin.coroutines.cancellation.CancellationException
 
+
+@HiltWorker
+class FeedSyncWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val topRepo: TopStoriesFeedRepository,
+    private val prefs: SyncPreferences,
+    private val deduper: NotificationDeduper
+) : CoroutineWorker(context, params) {
+
+    override suspend fun doWork(): Result {
+        val now = System.currentTimeMillis()
+
+        return try {
+            val notificationsEnabled = prefs.notificationsEnabledFlow.first()
+            val frequency = prefs.notificationFrequencyFlow.first()
+
+            val newItems = topRepo.workerSync()
+            if (newItems.isEmpty()) return Result.success()
+
+            val breaking = newItems.filter { isBreaking(it, now) }
+
+            if (breaking.isNotEmpty()) {
+                val uniqueBreaking = breaking
+                    .distinctBy { it.link }
+                    .filterNot { deduper.isRecentlyNotified(it.link) }
+
+                if (uniqueBreaking.isNotEmpty() && notificationsEnabled) {
+                    showFeedNotification(uniqueBreaking, applicationContext)
+                    deduper.markNotified(uniqueBreaking.map { it.link })
+                    prefs.setLastNotified(FeedKey.TOP_STORIES.name, now)
+                }
+            }
+
+            val regular = newItems - breaking
+            if (regular.isEmpty()) return Result.success()
+            if (!notificationsEnabled || frequency == NotificationFrequency.NEVER) return Result.success()
+            if (!shouldNotify(now, frequency)) return Result.success()
+
+            val uniqueRegular = regular
+                .distinctBy { it.link }
+                .filterNot { deduper.isRecentlyNotified(it.link) }
+
+            if (uniqueRegular.isNotEmpty()) {
+                showFeedNotification(uniqueRegular, applicationContext)
+                deduper.markNotified(uniqueRegular.map { it.link })
+                prefs.setLastNotified(FeedKey.TOP_STORIES.name, now)
+            }
+
+            Result.success()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.retry()
+        }
+    }
+
+    private suspend fun shouldNotify(
+        now: Long,
+        frequency: NotificationFrequency
+    ): Boolean {
+        val last = prefs.getLastNotified(FeedKey.TOP_STORIES.name)
+        return now - last >= frequency.minIntervalMs
+    }
+}
+
+
+/*
 
 @HiltWorker
 class FeedSyncWorker @AssistedInject constructor(
@@ -108,6 +175,7 @@ class FeedSyncWorker @AssistedInject constructor(
     }
 }
 
+*/
 
 /*
 

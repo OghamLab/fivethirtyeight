@@ -1,13 +1,47 @@
 package com.ola.fivethirtyeight.dataSource
 
 import com.ola.fivethirtyeight.api.ApiService
+import com.ola.fivethirtyeight.config.FeedConfig
+import com.ola.fivethirtyeight.config.TOP_STORY_FEEDS
 import com.ola.fivethirtyeight.model.FeedItem
 import com.ola.fivethirtyeight.parser.parseRss
-import com.ola.fivethirtyeight.utils.extractGoogleImage
-import org.jsoup.nodes.Element
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
 
+class TopStoriesDataSourceImpl @Inject constructor(
+    private val apiService: ApiService
+) : TopStoriesDataSource {
+
+    override suspend fun fetchAllFeeds(): List<FeedItem> = coroutineScope {
+        TOP_STORY_FEEDS
+            .map { feed ->
+                async { fetch(feed) }
+            }
+            .flatMap { it.await() }
+    }
+
+    override suspend fun fetchFeed(name: String): List<FeedItem> {
+        val feed = TOP_STORY_FEEDS.firstOrNull { it.name == name }
+            ?: return emptyList()
+        return fetch(feed)
+    }
+
+    private suspend fun fetch(feed: FeedConfig): List<FeedItem> {
+        val response = apiService.getFeedItems(feed.url)
+        if (!response.isSuccessful) return emptyList()
+
+        return parseRss(
+            xml = response.body().toString(),
+            imageExtractor = feed.imageExtractor,
+            titleTransformer = feed.titleTransformer
+        )
+    }
+}
+
+
+/*
 class TopStoriesDataSourceImpl @Inject constructor(
     private val apiService: ApiService
 ) : TopStoriesDataSource {
@@ -46,8 +80,19 @@ class TopStoriesDataSourceImpl @Inject constructor(
         )
 
 
+*/
 
-    private suspend fun fetchAndParse(
+
+
+
+
+
+
+
+
+
+
+    /*private suspend fun fetchAndParse(
         url: String,
         image: (Element) -> String = { "" },
         titleTransform: (String) -> String = { it }
@@ -61,7 +106,26 @@ class TopStoriesDataSourceImpl @Inject constructor(
             titleTransformer = titleTransform
         )
     }
-}
+
+
+
+    private suspend fun fetchFeed(feed: FeedConfig): List<FeedItem> {
+        val response = apiService.getFeedItems(feed.url)
+        if (!response.isSuccessful) return emptyList()
+
+        return parseRss(
+            xml = response.body().toString(),
+            imageExtractor = feed.imageExtractor,
+            titleTransformer = feed.titleTransformer
+        )
+    }
+
+
+
+
+
+
+}*/
 
 
 

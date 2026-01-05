@@ -74,8 +74,8 @@ abstract class BaseFeedRepository<Entity, Domain>(
         link: String,
         entitySaved: (Entity) -> Boolean
     ): Flow<Boolean> =
-        dao.getFeedsBySource(link)
-            .map { it.firstOrNull()?.let(entitySaved) == true }
+        dao.getItemByLink(link)
+            .map { it != null && entitySaved(it) }
 
     fun observeSaved(
         entityToDomain: (Entity) -> Domain
