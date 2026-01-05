@@ -18,10 +18,11 @@ interface FiveThirtyEightItemDao: BaseFeedDao<FiveThirtyEightItemEntity> {
 
 
     /** UI: observe a single feed item by link */
-    @Query("SELECT * FROM fiveThirtyEight_items WHERE link = :link ORDER BY timeInMil DESC")
-    override fun getFeedsBySource(link: String): Flow<List<FiveThirtyEightItemEntity>>
+   // @Query("SELECT * FROM fiveThirtyEight_items WHERE link = :link ORDER BY timeInMil DESC")
+   // override fun getFeedsBySource(link: String): Flow<FiveThirtyEightItemEntity?>
 
-
+    @Query("SELECT * FROM fiveThirtyEight_items WHERE link = :link LIMIT 1")
+    override fun getItemByLink(link: String): Flow<FiveThirtyEightItemEntity?>
     /** UI: observe saved items */
     @Query("SELECT * FROM fiveThirtyEight_items WHERE isSavedForLater = 1 ORDER BY publishedAt DESC")
     override fun getSavedItems(): Flow<List<FiveThirtyEightItemEntity>>

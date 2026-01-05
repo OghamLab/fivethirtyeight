@@ -77,6 +77,12 @@ class SharedViewModel @Inject constructor(
         _selectedFeedItem.value = item
     }
 
+    val topStoriesPaging by lazy {
+        topStoriesFeedRepository.pagingTopStories().cachedIn(viewModelScope)
+    }
+
+
+
     // --- Scroll position ---
     private val _firstVisibleItemIndex = MutableStateFlow(0)
     val firstVisibleItemIndex: StateFlow<Int> = _firstVisibleItemIndex
@@ -160,10 +166,10 @@ class SharedViewModel @Inject constructor(
     //val topStoriesState: StateFlow<ResourceState<List<FeedItem>>> = _topStoriesState
 
 
-    val topStoriesPaging =
+    /*val topStoriesPaging =
         topStoriesFeedRepository
             .pagingTopStories()
-            .cachedIn(viewModelScope)
+            .cachedIn(viewModelScope)*/
 
     /*val topStoriesPaging = Pager(
         config = PagingConfig(pageSize = 20),

@@ -17,10 +17,11 @@ interface BusinessItemDao: BaseFeedDao<BusinessItemEntity> {
 
 
     /** UI: observe a single feed item by link */
-    @Query("SELECT * FROM bus_items WHERE link = :link ORDER BY timeInMil DESC")
-    override fun getFeedsBySource(link: String): Flow<List<BusinessItemEntity>>
+    //@Query("SELECT * FROM bus_items WHERE link = :link ORDER BY timeInMil DESC")
+   // override fun getFeedsBySource(link: String): Flow<BusinessItemEntity?>
 
-
+    @Query("SELECT * FROM bus_items WHERE link = :link LIMIT 1")
+    override fun getItemByLink(link: String): Flow<BusinessItemEntity?>
     /** UI: observe saved items */
     @Query("SELECT * FROM bus_items WHERE isSavedForLater = 1 ORDER BY publishedAt DESC")
     override fun getSavedItems(): Flow<List<BusinessItemEntity>>

@@ -18,9 +18,10 @@ interface PoliticsItemDao: BaseFeedDao<PoliticsItemEntity> {
 
 
     /** UI: observe a single feed item by link */
-    @Query("SELECT * FROM politics_items WHERE link = :link ORDER BY timeInMil DESC")
-    override fun getFeedsBySource(link: String): Flow<List<PoliticsItemEntity>>
-
+   // @Query("SELECT * FROM politics_items WHERE link = :link ORDER BY timeInMil DESC")
+    //override fun getFeedsBySource(link: String): Flow<PoliticsItemEntity?>
+    @Query("SELECT * FROM politics_items WHERE link = :link LIMIT 1")
+    override fun getItemByLink(link: String): Flow<PoliticsItemEntity?>
 
     /** UI: observe saved items */
     @Query("SELECT * FROM politics_items WHERE isSavedForLater = 1 ORDER BY publishedAt DESC")

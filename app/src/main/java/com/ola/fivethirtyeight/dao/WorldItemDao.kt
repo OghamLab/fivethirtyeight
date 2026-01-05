@@ -17,10 +17,11 @@ interface WorldItemDao: BaseFeedDao<WorldItemEntity> {
 
 
     /** UI: observe a single feed item by link */
-    @Query("SELECT * FROM world_items WHERE link = :link ORDER BY timeInMil DESC")
-    override fun getFeedsBySource(link: String): Flow<List<WorldItemEntity>>
+    //@Query("SELECT * FROM world_items WHERE link = :link ORDER BY timeInMil DESC")
+   // override fun getFeedsBySource(link: String): Flow<WorldItemEntity?>
 
-
+    @Query("SELECT * FROM world_items WHERE link = :link LIMIT 1")
+    override fun getItemByLink(link: String): Flow<WorldItemEntity?>
     /** UI: observe saved items */
     @Query("SELECT * FROM world_items WHERE isSavedForLater = 1 ORDER BY publishedAt DESC")
     override fun getSavedItems(): Flow<List<WorldItemEntity>>

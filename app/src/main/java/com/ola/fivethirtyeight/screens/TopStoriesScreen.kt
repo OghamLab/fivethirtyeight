@@ -1,15 +1,66 @@
 package com.ola.fivethirtyeight.screens
 
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.ola.fivethirtyeight.emptystate.FeedEmptyState
+import com.ola.fivethirtyeight.emptystate.FeedRetryState
 import com.ola.fivethirtyeight.model.FeedItem
 import com.ola.fivethirtyeight.utils.AnimatedFeedCard
 import com.ola.fivethirtyeight.utils.ShimmerFeedCard
 import com.ola.fivethirtyeight.viewmodel.SharedViewModel
 
+@Composable
+fun TopStoriesScreen(
+    viewModel: SharedViewModel = hiltViewModel(),
+    onArticleClick: (FeedItem) -> Unit
+) {
+    val pagingItems = viewModel.topStoriesPaging.collectAsLazyPagingItems()
+
+    // 🔑 REQUIRED: force refresh after process restart
+    LaunchedEffect(Unit) {
+        pagingItems.refresh()
+    }
+
+    FeedListScreen(
+        pagingItems = pagingItems,
+        savedIndex = viewModel.firstVisibleItemIndex.collectAsState().value,
+        savedOffset = viewModel.firstVisibleItemScrollOffset.collectAsState().value,
+        onSaveScroll = viewModel::saveScrollPosition,
+        onRefresh = { pagingItems.refresh() },
+        cardContent = { AnimatedFeedCard(it) { onArticleClick(it) } },
+        shimmerContent = { ShimmerFeedCard() },
+        emptyContent = { FeedEmptyState() },
+        retryContent = { FeedRetryState(it) }
+    )
+}
+
+
+/*@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopStoriesScreen(
+    viewModel: SharedViewModel = hiltViewModel(),
+    onArticleClick: (FeedItem) -> Unit
+) {
+    val pagingItems = viewModel.topStoriesPaging.collectAsLazyPagingItems()
+
+    FeedListScreen(
+        pagingItems = pagingItems,
+        savedIndex = viewModel.firstVisibleItemIndex.collectAsState().value,
+        savedOffset = viewModel.firstVisibleItemScrollOffset.collectAsState().value,
+        onSaveScroll = viewModel::saveScrollPosition,
+        onRefresh = { pagingItems.refresh() },
+        cardContent = { AnimatedFeedCard(it) { onArticleClick(it) } },
+        shimmerContent = { ShimmerFeedCard() },
+        emptyContent = { FeedEmptyState() },
+        retryContent = { onRetry -> FeedRetryState(onRetry) }
+    )
+}*/
+
+
+/*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +82,7 @@ fun TopStoriesScreen(
         shimmerContent = { ShimmerFeedCard() }
     )
 }
+*/
 
 
 /*
