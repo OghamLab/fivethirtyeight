@@ -1,5 +1,4 @@
 package com.ola.fivethirtyeight.remoteMediator
-
 import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
@@ -89,7 +88,7 @@ class TopStoriesRemoteMediator(
         return MediatorResult.Error(lastError ?: IllegalStateException("Unknown error"))
     }
 
-    private suspend fun fetchRemote(): List<FeedItem> = coroutineScope {
+    /*private suspend fun fetchRemote(): List<FeedItem> = coroutineScope {
         val abc = async { dataSource.getFeedList() }
         val google = async { dataSource.getGoogleTop() }
         val ny = async { dataSource.getNyTop() }
@@ -102,7 +101,18 @@ class TopStoriesRemoteMediator(
             npr.await(),
             onlyRecentMillis = 172800000
         )
+    }*/
+
+    private suspend fun fetchRemote(): List<FeedItem> {
+        val items = dataSource.fetchAllFeeds()
+
+        return dataSource.concatenate(
+            items,
+            onlyRecentMillis = 172800000 // 48h
+        )
     }
+
+
 }
 
 
@@ -340,6 +350,18 @@ suspend fun <R> FeedItemDao.withTransaction(block: suspend () -> R): R =
 
 /*
 
+=======
+import androidx.room.withTransaction
+import com.ola.fivethirtyeight.dao.FeedItemDao
+import com.ola.fivethirtyeight.dao.FeedRefreshDao
+import com.ola.fivethirtyeight.dataSource.TopStoriesDataSource
+import com.ola.fivethirtyeight.database.NewsDatabase
+import com.ola.fivethirtyeight.model.FeedItemEntity
+import com.ola.fivethirtyeight.model.FeedRefreshEntity
+import com.ola.fivethirtyeight.model.toEntity
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+>>>>>>> origin/master
 
 @OptIn(ExperimentalPagingApi::class)
 class TopStoriesRemoteMediator(

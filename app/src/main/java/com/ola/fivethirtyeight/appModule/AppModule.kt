@@ -82,30 +82,14 @@ object AppModule {
     }
 
 
-   /* @Singleton
+    @Singleton
     @Provides
     fun providesTopStoriesRepository(topStoriesDataSource: TopStoriesDataSource,
-        feedItemDao: FeedItemDao,  refreshDao: FeedRefreshDao, database: NewsDatabase
+        feedItemDao: FeedItemDao, newsDatabase: NewsDatabase , syncPreferences: SyncPreferences
     ): TopStoriesFeedRepository {
-        return TopStoriesFeedRepository (topStoriesDataSource, feedItemDao, refreshDao, database)
+        return TopStoriesFeedRepository (topStoriesDataSource,  feedItemDao,    newsDatabase, syncPreferences )
 
-    }*/
-
-     @Singleton
-        @Provides
-        fun providesTopStoriesRepository(topStoriesDataSource: TopStoriesDataSource,
-                                         feedItemDao: FeedItemDao, syncPreferences: SyncPreferences, newsDatabase: NewsDatabase
-        ): TopStoriesFeedRepository {
-            return TopStoriesFeedRepository(topStoriesDataSource, feedItemDao, newsDatabase, syncPreferences)
-
-        }
-
-
-
-
-
-
-
+    }
 
 
     @Singleton
@@ -217,15 +201,11 @@ object AppModule {
     }
 
 
-    @Provides
+    /*@Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context) =
-        Room.databaseBuilder(context, NewsDatabase::class.java, "news_db")
-            .addMigrations(DatabaseMigrations.MIGRATION_4_5)
-
-
-            .build()
-
+        Room.databaseBuilder(context, NewsDatabase::class.java, "news_db").build()
+*/
 
 
     @Provides
@@ -304,7 +284,19 @@ object AppModule {
                     context.preferencesDataStoreFile("sync_prefs")
                 }
             )
-    }
+
+
+    @Provides
+    @Singleton
+    fun provideDatabase(@ApplicationContext context: Context) =
+        Room.databaseBuilder(context, NewsDatabase::class.java, "news_db")
+            .addMigrations(DatabaseMigrations.MIGRATION_4_5)
+
+
+            .build()
+
+
+}
 
 
 

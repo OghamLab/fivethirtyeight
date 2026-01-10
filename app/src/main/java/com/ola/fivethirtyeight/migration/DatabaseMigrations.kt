@@ -3,6 +3,7 @@ package com.ola.fivethirtyeight.migration
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
+
 object DatabaseMigrations {
 
     val MIGRATION_4_5 = object : Migration(4, 5) {
@@ -54,6 +55,8 @@ object DatabaseMigrations {
 
 
 /*
+=======
+>>>>>>> origin/master
 // DatabaseMigrations.kt
 object DatabaseMigrations {
 
@@ -61,6 +64,7 @@ object DatabaseMigrations {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL(
                 """
+<<<<<<< HEAD
                 ALTER TABLE feed_items
                 ADD COLUMN category TEXT NOT NULL DEFAULT ''
             """.trimIndent()
@@ -73,10 +77,14 @@ object DatabaseMigrations {
             db.execSQL(
                 """
                 ALTER TABLE feed_items
+=======
+                ALTER TABLE world_items
+>>>>>>> origin/master
                 ADD COLUMN category TEXT NOT NULL DEFAULT ''
             """.trimIndent()
             )
         }
+<<<<<<< HEAD
     }*//*
 
 
@@ -130,3 +138,4 @@ object DatabaseMigrations {
     }
 
 }*/
+

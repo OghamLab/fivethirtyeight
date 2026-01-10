@@ -46,7 +46,25 @@ class TopStoriesFeedRepository @Inject constructor(
             .flow
             .map { pagingData -> pagingData.map { it.toFeedItem() } }
 
+
     suspend fun workerSync(): List<FeedItem> {
+        val remote = dataSource.concatenate(
+            dataSource.fetchAllFeeds(),
+            onlyRecentMillis = 172800000
+        )
+
+        val lastSync = syncPreferences.getLastSyncTime()
+        val now = System.currentTimeMillis()
+
+        val newItems = remote.filter { it.timeInMil > lastSync }
+
+        syncPreferences.setLastSyncTime(now)
+
+        return newItems
+    }
+
+
+    /*suspend fun workerSync(): List<FeedItem> {
         val remote = coroutineScope {
             val abc = async { dataSource.getFeedList() }
             val google = async { dataSource.getGoogleTop() }
@@ -71,6 +89,10 @@ class TopStoriesFeedRepository @Inject constructor(
 
         return newItems
     }
+*/
+
+
+
 
     fun isArticleSaved(link: String): Flow<Boolean> =
         dao.getItemByLink(link).map { it?.isSavedForLater == true }
