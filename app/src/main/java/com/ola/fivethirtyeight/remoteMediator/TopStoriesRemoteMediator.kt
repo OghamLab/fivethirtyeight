@@ -13,8 +13,6 @@ import com.ola.fivethirtyeight.datastore.SyncPreferences
 import com.ola.fivethirtyeight.model.FeedItem
 import com.ola.fivethirtyeight.model.FeedItemEntity
 import com.ola.fivethirtyeight.model.toEntity
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 
 
@@ -39,6 +37,8 @@ class TopStoriesRemoteMediator(
             Log.d(tag, "Ignoring $loadType, treating as endOfPagination")
             return MediatorResult.Success(endOfPaginationReached = true)
         }
+
+
 
         var attempt = 0
         var lastError: Throwable? = null

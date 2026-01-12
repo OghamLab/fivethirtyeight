@@ -94,8 +94,8 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesTopStoriesDataSource(apiService: ApiService): TopStoriesDataSource {
-        return TopStoriesDataSourceImpl(apiService)
+    fun providesTopStoriesDataSource(): TopStoriesDataSource {
+        return TopStoriesDataSourceImpl()
 
     }
 
@@ -291,8 +291,6 @@ object AppModule {
     fun provideDatabase(@ApplicationContext context: Context) =
         Room.databaseBuilder(context, NewsDatabase::class.java, "news_db")
             .addMigrations(DatabaseMigrations.MIGRATION_4_5)
-
-
             .build()
 
 

@@ -2,24 +2,27 @@ package com.ola.fivethirtyeight.screens
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,637 +38,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.ola.fivethirtyeight.R
+import com.ola.fivethirtyeight.model.FeedCluster
 import com.ola.fivethirtyeight.model.FeedItem
 import com.ola.fivethirtyeight.utils.toRelativeTime
 import com.ola.fivethirtyeight.viewmodel.SharedViewModel
-
-@Composable
-fun FeedCardDispatcher(
-    item: FeedItem,
-    onArticleClick: (FeedItem) -> Unit
-) {
-
-    if (item.imageUrl.isNotEmpty() && item.description.isNotEmpty() && !item.imageUrl.contains("default")) {
-        FeedCardLargeImageDesc(item,) {
-            onArticleClick(item)
-        }
-    } else if ((item.imageUrl.isEmpty() || item.imageUrl.contains("default") || item.imageUrl.contains(
-            "null"
-        )) && item.description.isNotEmpty()
-    ) {
-        FeedCardDesc(item) {
-            onArticleClick(item)
-        }
-
-    } else if (item.imageUrl.isNotEmpty() && item.description.isEmpty() && !item.imageUrl.contains("default")) {
-        FeedCardSmallImage(item) {
-            onArticleClick(item)
-        }
-
-    } else if ((item.imageUrl.isEmpty() || item.imageUrl.contains("default") || item.imageUrl.contains(
-            "null"
-        )) && item.description.isEmpty()
-    ) {
-        FeedCardEmptyBoth(item) {
-            onArticleClick(item)
-        }
-
-    } else if (item.imageUrl.isEmpty() || item.imageUrl.contains("default") || item.imageUrl.contains(
-            "null"
-        )
-    ) {
-        FeedEmptyImageOnly(item) {
-            onArticleClick(item)
-        }
-
-    } else {
-        FeedDefaultNoImageDec(item) {
-            onArticleClick(item)
-        }
-
-    }
-
-
-}
-
-@Composable
-fun FeedCardDispatcherSaved(
-    item: FeedItem,
-    viewModel: SharedViewModel = hiltViewModel(),
-    onArticleClick: (FeedItem) -> Unit
-) {
-    FeedCard(
-        item = item,
-        viewModel = viewModel,
-        onClick = { onArticleClick(item) }
-    )
-}
-
-
-@Composable
-private fun FeedDefaultNoImageDec(
-    it: FeedItem,
-    onClick: () -> Unit
-) {
-    var isVisible by remember { mutableStateOf(false) }
-    val animatedElevation by animateDpAsState(
-        targetValue = if (isVisible) 8.dp else 0.dp, animationSpec = tween(durationMillis = 500),
-        label = "",
-
-        )
-
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }
-
-
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(start = 2.dp, end = 2.dp, bottom = 16.dp)
-            .clickable { onClick },
-        tonalElevation = animatedElevation,
-        color = MaterialTheme.colorScheme.tertiary,
-
-        shadowElevation = 5.dp,
-        shape = RoundedCornerShape(5.dp),
-        border = BorderStroke(1.dp, Color.LightGray)
-
-
-    ) {
-
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-        )
-
-
-        {
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 10.dp)
-            ) {
-
-                Text(
-                    text = it.title,
-                    modifier = Modifier.padding(
-                        top = 12.dp,
-                        bottom = 4.dp,
-                        start = 16.dp
-                    ),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = typography.titleMedium,
-                    fontWeight = FontWeight.ExtraBold,
-
-                    )
-
-                Text(
-                    text = it.publishedAt,
-                    modifier = Modifier.padding(
-                        bottom = 8.dp,
-                        start = 16.dp
-                    ),
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = typography.titleSmall
-                )
-
-            }
-
-        }
-
-    }
-}
-
-@Composable
-private fun FeedEmptyImageOnly(
-    it: FeedItem,
-    onClick: () -> Unit
-) {
-    var isVisible by remember { mutableStateOf(false) }
-    val animatedElevation by animateDpAsState(
-        targetValue = if (isVisible) 8.dp else 0.dp, animationSpec = tween(durationMillis = 500),
-        label = "",
-
-        )
-
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }
-
-
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-
-
-            .padding(start = 2.dp, end = 2.dp, bottom = 16.dp)
-            .clickable(onClick = onClick),
-        color = MaterialTheme.colorScheme.tertiary,
-        tonalElevation = animatedElevation,
-        shadowElevation = 5.dp,
-        shape = RoundedCornerShape(5.dp),
-        border = BorderStroke(1.dp, Color.LightGray),
-
-
-        ) {
-
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-        )
-
-
-        {
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 10.dp)
-            ) {
-
-                Text(
-                    text = it.title,
-                    modifier = Modifier.padding(
-                        top = 12.dp,
-                        bottom = 4.dp,
-                        start = 16.dp
-                    ),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = typography.titleMedium.copy(lineHeight = 24.sp),
-                    fontWeight = FontWeight.ExtraBold
-                )
-
-                Text(
-                    text = it.description,
-                    modifier = Modifier.padding(
-                        bottom = 16.dp,
-                        start = 16.dp,
-                        top = 8.dp,
-                        end = 16.dp
-                    ),
-                    color = MaterialTheme.colorScheme.onTertiary,
-                    style = typography.bodyMedium.copy(lineHeight = 24.sp),
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-
-
-                Text(
-                    text = it.publishedAt.toRelativeTime(),
-                    modifier = Modifier.padding(
-                        bottom = 8.dp,
-                        start = 16.dp
-                    ),
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = typography.titleSmall
-                )
-
-            }
-        }
-    }
-}
-
-@Composable
-private fun FeedCardEmptyBoth(
-    it: FeedItem,
-    onClick: () -> Unit
-) {
-    var isVisible by remember { mutableStateOf(false) }
-    val animatedElevation by animateDpAsState(
-        targetValue = if (isVisible) 8.dp else 0.dp, animationSpec = tween(durationMillis = 500),
-        label = "",
-
-        )
-
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }
-
-
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-
-
-            .padding(start = 2.dp, end = 2.dp, bottom = 16.dp)
-            .clickable(onClick = onClick),
-        tonalElevation = animatedElevation,
-        color = MaterialTheme.colorScheme.tertiary,
-        shadowElevation = 5.dp,
-        shape = RoundedCornerShape(5.dp),
-        border = BorderStroke(1.dp, Color.LightGray)
-    )
-
-    {
-
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-        )
-
-
-        {
-
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 10.dp)
-            ) {
-
-                Text(
-                    text = it.title,
-                    modifier = Modifier.padding(
-                        top = 4.dp,
-                        bottom = 0.dp,
-                        start = 16.dp
-                    ),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = typography.titleMedium.copy(lineHeight = 24.sp),
-                    fontWeight = FontWeight.ExtraBold
-                )
-
-
-                Text(
-                    text = it.publishedAt.toRelativeTime(),
-                    modifier = Modifier.padding(
-                        top = 12.dp,
-                        bottom = 8.dp,
-                        start = 16.dp
-                    ),
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = typography.titleSmall
-                )
-
-            }
-        }
-    }
-}
-
-@Composable
-@OptIn(ExperimentalGlideComposeApi::class)
-private fun FeedCardSmallImage(
-    it: FeedItem,
-    onClick: () -> Unit
-) {
-    var isVisible by remember { mutableStateOf(false) }
-    val animatedElevation by animateDpAsState(
-        targetValue = if (isVisible) 8.dp else 0.dp, animationSpec = tween(durationMillis = 500),
-        label = "",
-
-        )
-
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }
-
-
-
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(start = 4.dp, end = 4.dp, bottom = 16.dp)
-
-            .clickable(onClick = onClick),
-        tonalElevation = animatedElevation,
-        color = MaterialTheme.colorScheme.tertiary,
-
-        shadowElevation = 5.dp,
-        shape = RoundedCornerShape(5.dp),
-        border = BorderStroke(1.dp, Color.LightGray)
-
-
-    ) {
-
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-
-                .wrapContentHeight()
-        )
-
-
-        {
-
-            GlideImage(
-                modifier = Modifier.size(
-                    width = 150.dp,
-                    height = 120.dp
-                ),
-
-                model = it.imageUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                requestBuilderTransform = { requestBuilder ->
-                    requestBuilder
-                        .placeholder(R.drawable.loading_animation)
-                        .error(R.drawable.picsart)
-                        .transform(CenterCrop())
-                }
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-
-
-            ) {
-
-
-                Text(
-                    modifier = Modifier.padding(
-                        top = 12.dp,
-                        bottom = 4.dp,
-                        start = 16.dp
-                    ),
-                    text = it.title,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = typography.titleMedium,
-                    fontWeight = FontWeight.ExtraBold,
-
-                    )
-
-                Text(
-                    text = it.publishedAt.toRelativeTime(),
-                    modifier = Modifier.padding(
-                        bottom = 8.dp,
-                        start = 16.dp
-                    ),
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = typography.titleSmall
-                )
-
-            }
-        }
-
-    }
-}
-
-
-@Composable
-private fun FeedCardDesc(
-    it: FeedItem,
-    onClick: () -> Unit
-) {
-    var isVisible by remember { mutableStateOf(false) }
-    val animatedElevation by animateDpAsState(
-        targetValue = if (isVisible) 8.dp else 0.dp, animationSpec = tween(durationMillis = 500),
-        label = "",
-
-        )
-
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }
-
-
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(start = 4.dp, end = 4.dp, bottom = 16.dp)
-
-            .clickable(onClick = onClick),
-        tonalElevation = animatedElevation,
-        color = MaterialTheme.colorScheme.tertiary,
-
-        shadowElevation = 5.dp,
-        shape = RoundedCornerShape(5.dp),
-        border = BorderStroke(1.dp, Color.LightGray)
-
-
-    ) {
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .wrapContentHeight()
-
-
-        )
-
-        {
-
-            Spacer(Modifier.height(12.dp))
-
-            Text(
-                text = it.title,
-                modifier = Modifier.padding(
-                    bottom = 8.dp,
-                    start = 16.dp
-                ),
-                color = MaterialTheme.colorScheme.onBackground,
-                style = typography.titleLarge.copy(lineHeight = 24.sp),
-                fontWeight = FontWeight.Bold
-
-            )
-            Text(
-                text = it.description,
-                modifier = Modifier.padding(
-                    bottom = 16.dp,
-                    start = 16.dp,
-                    top = 8.dp,
-                    end = 16.dp
-
-                ),
-                color = MaterialTheme.colorScheme.onTertiary,
-                style = typography.bodyMedium.copy(lineHeight = 24.sp),
-
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
-
-
-            Text(
-                text = it.publishedAt.toRelativeTime(),
-                modifier = Modifier.padding(
-                    bottom = 24.dp,
-                    start = 16.dp
-                ),
-                color = MaterialTheme.colorScheme.secondary,
-                style = typography.titleSmall,
-
-                )
-
-
-        }
-    }
-}
-
-@Composable
-@OptIn(ExperimentalGlideComposeApi::class, ExperimentalFoundationApi::class)
-private fun FeedCardLargeImageDesc(
-    it: FeedItem,
-    onClick: () -> Unit
-) {
-    var isVisible by remember { mutableStateOf(false) }
-    val animatedElevation by animateDpAsState(
-        targetValue = if (isVisible) 8.dp else 0.dp, animationSpec = tween(durationMillis = 500),
-        label = "",
-
-        )
-
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }
-
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(start = 4.dp, end = 2.dp, bottom = 16.dp)
-
-
-            .clickable(
-                onClick = onClick
-            ),
-        color = MaterialTheme.colorScheme.tertiary,
-
-        tonalElevation = animatedElevation,
-
-
-        shadowElevation = 5.dp,
-        shape = RoundedCornerShape(5.dp),
-        border = BorderStroke(1.dp, Color.LightGray),
-
-        ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .wrapContentHeight()
-
-
-        ) {
-
-            GlideImage(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .height(300.dp),
-                model = it.imageUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                requestBuilderTransform = { requestBuilder ->
-                    requestBuilder
-                        .placeholder(R.drawable.loading_animation)
-                        .error(R.drawable.picsart)
-                        .transform(CenterCrop())
-                }
-
-            )
-
-            Spacer(Modifier.height(12.dp))
-            Text(
-                modifier = Modifier.padding(
-
-                    bottom = 4.dp,
-                    start = 16.dp,
-                    end = 16.dp
-
-                ),
-                text = it.title,
-                color = MaterialTheme.colorScheme.onBackground,
-                style = typography.titleLarge,
-                fontWeight = FontWeight.ExtraBold,
-
-                )
-
-
-            Text(
-                modifier = Modifier.padding(
-                    top = 8.dp,
-                    bottom = 16.dp,
-                    start = 16.dp,
-                    end = 16.dp
-                ),
-                text = it.description,
-                color = MaterialTheme.colorScheme.onTertiary,
-                style = typography.bodyMedium.copy(lineHeight = 24.sp),
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Text(
-                text = it.publishedAt.toRelativeTime(),
-                modifier = Modifier.padding(
-                    bottom = 8.dp,
-                    start = 16.dp,
-
-                    ),
-                color = MaterialTheme.colorScheme.secondary,
-                style = typography.titleSmall
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-        }
-    }
-}
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -677,9 +65,10 @@ fun FeedCard(
     onClick: () -> Unit
 ) {
     var isVisible by remember { mutableStateOf(false) }
+
     val animatedElevation by animateDpAsState(
         targetValue = if (isVisible) 8.dp else 0.dp,
-        animationSpec = tween(durationMillis = 500),
+        animationSpec = tween(durationMillis = 350),
         label = ""
     )
 
@@ -689,30 +78,33 @@ fun FeedCard(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(horizontal = 4.dp, vertical = 8.dp)
-            .clickable { onClick() },
+            .padding(horizontal = 6.dp, vertical = 8.dp)
+            .clickable(onClick = onClick),
         tonalElevation = animatedElevation,
-        color = MaterialTheme.colorScheme.tertiary,
-        shadowElevation = 5.dp,
-        shape = RoundedCornerShape(5.dp),
-        border = BorderStroke(1.dp, Color.LightGray)
+        shadowElevation = 4.dp,
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, Color.LightGray),
+        color = MaterialTheme.colorScheme.tertiary
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
         ) {
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 48.dp) // leave space for icons
+                    .padding(end = 56.dp) // space for icons
             ) {
-                // 🖼️ Optional image
-                /*if (!item.imageUrl.isNullOrEmpty()) {
+
+                // If you want to re-enable image support later, this is ready.
+                /*
+                if (!item.imageUrl.isNullOrEmpty()) {
                     GlideImage(
                         modifier = Modifier
                             .size(width = 120.dp, height = 100.dp)
-                            .clip(RoundedCornerShape(topStart = 5.dp, bottomStart = 5.dp)),
+                            .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)),
                         model = item.imageUrl,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
@@ -722,13 +114,15 @@ fun FeedCard(
                                 .transform(CenterCrop())
                         }
                     )
-                }*/
+                }
+                */
 
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(12.dp)
+                        .padding(horizontal = 12.dp, vertical = 12.dp)
                 ) {
+
                     Text(
                         text = item.title,
                         style = typography.titleMedium,
@@ -749,7 +143,8 @@ fun FeedCard(
                         )
                     }
 
-                    Spacer(Modifier.height(6.dp))
+                    Spacer(Modifier.height(8.dp))
+
                     Text(
                         text = item.publishedAt.toRelativeTime(),
                         style = typography.titleSmall,
@@ -758,12 +153,13 @@ fun FeedCard(
                 }
             }
 
-            // 📤 Share + ❌ Delete icons anchored bottom‑end
+            // Action icons
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(4.dp)
             ) {
+
                 IconButton(onClick = {
                     val sendIntent = Intent().apply {
                         action = Intent.ACTION_SEND
@@ -784,5 +180,339 @@ fun FeedCard(
         }
     }
 }
+
+
+sealed class FeedCardLayout {
+    data object LargeImageWithDesc : FeedCardLayout()
+    data object SmallImageOnly : FeedCardLayout()
+    data object DescriptionOnly : FeedCardLayout()
+    data object Empty : FeedCardLayout()
+}
+
+
+fun resolveLayout(item: FeedItem): FeedCardLayout {
+    val hasImage = !item.imageUrl.isNullOrEmpty() &&
+            !item.imageUrl.contains("default") &&
+            !item.imageUrl.contains("null")
+
+    val hasDesc = !item.description.isNullOrEmpty()
+
+    return when {
+        hasImage && hasDesc -> FeedCardLayout.LargeImageWithDesc
+        hasImage && !hasDesc -> FeedCardLayout.SmallImageOnly
+        !hasImage && hasDesc -> FeedCardLayout.DescriptionOnly
+        else -> FeedCardLayout.Empty
+    }
+}
+
+
+@Composable
+fun FeedClusterCard(
+    cluster: FeedCluster,
+    onArticleClick: (FeedItem) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 6.dp, vertical = 8.dp)
+    ) {
+
+        // HERO CARD (main article)
+        FeedCardUniversal(
+            item = cluster.main,
+            isSaved = false,
+            onClick = { onArticleClick(cluster.main) }
+        )
+
+        // VARIANTS HEADER
+        if (cluster.variants.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = !expanded }
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = if (expanded) "Hide other sources" else "More sources",
+                    style = typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Icon(
+                    imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = null
+                )
+            }
+        }
+
+        // VARIANT LIST
+        AnimatedVisibility(expanded) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
+            ) {
+                cluster.variants.forEach { variant ->
+                    VariantRow(
+                        item = variant,
+                        onClick = { onArticleClick(variant) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun VariantRow(
+    item: FeedItem,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 6.dp)
+    ) {
+
+        // Source logo (optional future upgrade)
+        /* AsyncImage(
+            model = item.sourceLogo,
+            contentDescription = null,
+            modifier = Modifier
+                .size(20.dp)
+                .clip(CircleShape)
+        ) */
+
+        Column(modifier = Modifier.padding(start = 8.dp)) {
+            Text(
+                text = item.title,
+                style = typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Text(
+                text = item.publishedAt.toRelativeTime(),
+                style = typography.labelSmall,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
+    }
+}
+
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun FeedCardUniversal(
+    item: FeedItem,
+    isSaved: Boolean = false,
+    viewModel: SharedViewModel? = null,
+    onClick: () -> Unit
+) {
+    val layout = remember(item) { resolveLayout(item) }
+
+    var isVisible by remember { mutableStateOf(false) }
+    val animatedElevation by animateDpAsState(
+        targetValue = if (isVisible) 8.dp else 0.dp,
+        animationSpec = tween(350),
+        label = ""
+    )
+    LaunchedEffect(Unit) { isVisible = true }
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(horizontal = 6.dp, vertical = 8.dp)
+            .clickable(onClick = onClick),
+        tonalElevation = animatedElevation,
+        shadowElevation = 4.dp,
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, Color.LightGray),
+        color = MaterialTheme.colorScheme.tertiary
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
+            // IMAGE SECTION
+            when (layout) {
+                FeedCardLayout.LargeImageWithDesc,
+                FeedCardLayout.SmallImageOnly -> {
+                    GlideImage(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(if (layout is FeedCardLayout.LargeImageWithDesc) 260.dp else 120.dp)
+                            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+                        model = item.imageUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        requestBuilderTransform = { rb ->
+                            rb.placeholder(R.drawable.loading_animation)
+                                .error(R.drawable.picsart)
+                                .transform(CenterCrop())
+                        }
+                    )
+                }
+
+                else -> Unit
+            }
+
+            // TEXT SECTION
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = item.title,
+                    style = typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                if (layout is FeedCardLayout.LargeImageWithDesc ||
+                    layout is FeedCardLayout.DescriptionOnly
+                ) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = item.description,
+                        style = typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onTertiary,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = item.publishedAt.toRelativeTime(),
+                    style = typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+
+            // ACTIONS (only for saved items)
+            if (isSaved && viewModel != null) {
+                val context = LocalContext.current
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    IconButton(
+                        onClick = {
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, item.link)
+                                type = "text/plain"
+                            }
+                            context.startActivity(
+                                Intent.createChooser(sendIntent, "Share via")
+                            )
+                        }
+                    ) {
+                        Icon(Icons.Default.Share, contentDescription = "Share")
+                    }
+
+                    IconButton(
+                        onClick = {
+                            viewModel.toggleSave(item.link, false)
+                        }
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = "Remove")
+                    }
+                }
+            }
+
+        }
+    }
+}
+
+
+/*@Composable
+fun FeedCardDispatcher(item: FeedItem, onArticleClick: (FeedItem) -> Unit) {
+    FeedCardUniversal(
+        item = item,
+        isSaved = false,
+        onClick = { onArticleClick(item) }
+    )
+}*/
+
+
+/*@Composable
+fun FeedCardDispatcher(
+    clusters: List<FeedCluster>,
+    onArticleClick: (FeedItem) -> Unit
+) {
+    LazyColumn {
+        items(clusters) { cluster ->
+            FeedClusterCard(cluster, onArticleClick)
+        }
+    }
+}*/
+@Composable
+fun FeedCardDispatcher(
+    item: FeedItem,
+    onArticleClick: (FeedItem) -> Unit
+) {
+    FeedCardUniversal(
+        item = item,
+        isSaved = false,
+        onClick = { onArticleClick(item) }
+    )
+}
+
+
+@Composable
+fun FeedClusterDispatcher(
+    clusters: List<FeedCluster>,
+    onArticleClick: (FeedItem) -> Unit
+) {
+    LazyColumn {
+        items(clusters) { cluster ->
+            FeedClusterCard(cluster, onArticleClick)
+        }
+    }
+}
+
+
+@Composable
+fun FeedCardDispatcherSaved(
+    item: FeedItem,
+    viewModel: SharedViewModel = hiltViewModel(),
+    onArticleClick: (FeedItem) -> Unit
+) {
+    FeedCardUniversal(
+        item = item,
+        isSaved = true,
+        viewModel = viewModel,
+        onClick = { onArticleClick(item) }
+    )
+}
+
+
+
+
+
+/*@Composable
+fun FeedCardDispatcherSaved(
+    item: FeedItem,
+    viewModel: SharedViewModel = hiltViewModel(),
+    onArticleClick: (FeedItem) -> Unit
+) {
+    FeedCardUniversal(
+        item = item,
+        isSaved = true,
+        viewModel = viewModel,
+        onClick = { onArticleClick(item) }
+    )
+}*/
 
 

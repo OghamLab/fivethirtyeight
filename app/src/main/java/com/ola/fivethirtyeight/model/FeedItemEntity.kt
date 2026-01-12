@@ -20,10 +20,8 @@ data class FeedItemEntity(
     val author: String,
     val publishedAt: String,
     val imageUrl: String,
-
     @PrimaryKey
     val link: String,
-
     val savedDate: String,
     val timeInMil: Long,
     val isSavedForLater: Boolean

@@ -1,16 +1,30 @@
 package com.ola.fivethirtyeight.dataSource
 
-import com.ola.fivethirtyeight.api.ApiService
-import com.ola.fivethirtyeight.config.FeedConfig
-import com.ola.fivethirtyeight.config.TOP_STORY_FEEDS
+import com.ola.fivethirtyeight.config.TOP_STORY_FEED_URLS
 import com.ola.fivethirtyeight.model.FeedItem
-import com.ola.fivethirtyeight.parser.parseRss
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import com.ola.fivethirtyeight.universalparser.parseUniversalFeeds
 import javax.inject.Inject
 
+class TopStoriesDataSourceImpl @Inject constructor() : TopStoriesDataSource {
 
-class TopStoriesDataSourceImpl @Inject constructor(
+    override suspend fun fetchAllFeeds(): List<FeedItem> {
+        return parseUniversalFeeds(TOP_STORY_FEED_URLS)
+    }
+
+    override suspend fun fetchFeed(name: String): List<FeedItem> {
+        // If you still want name-based lookup, map names to URLs:
+        val url = TOP_STORY_FEED_URLS.firstOrNull { it.contains(name, ignoreCase = true) }
+            ?: return emptyList()
+
+        return parseUniversalFeeds(listOf(url))
+    }
+}
+
+
+
+
+
+/*class TopStoriesDataSourceImpl @Inject constructor(
     private val apiService: ApiService
 ) : TopStoriesDataSource {
 
@@ -38,7 +52,7 @@ class TopStoriesDataSourceImpl @Inject constructor(
             titleTransformer = feed.titleTransformer
         )
     }
-}
+}*/
 
 
 /*

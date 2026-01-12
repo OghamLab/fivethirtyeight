@@ -9,6 +9,50 @@ object DatabaseMigrations {
     val MIGRATION_4_5 = object : Migration(4, 5) {
         override fun migrate(db: SupportSQLiteDatabase) {
 
+            db.execSQL(
+                """
+            CREATE TABLE feed_items_new (
+                title TEXT NOT NULL,
+                description TEXT NOT NULL,
+                content TEXT NOT NULL,
+                author TEXT NOT NULL,
+                publishedAt TEXT NOT NULL,
+                imageUrl TEXT NOT NULL,
+                link TEXT NOT NULL PRIMARY KEY,
+                savedDate TEXT NOT NULL,
+                timeInMil INTEGER NOT NULL,
+                isSavedForLater INTEGER NOT NULL
+            )
+            """.trimIndent()
+            )
+
+            db.execSQL(
+                """
+            INSERT INTO feed_items_new (
+                title, description, content, author, publishedAt,
+                imageUrl, link, savedDate, timeInMil, isSavedForLater
+            )
+            SELECT
+                title, description, content, author, publishedAt,
+                imageUrl, link, savedDate, timeInMil, isSavedForLater
+            FROM feed_items
+            """.trimIndent()
+            )
+
+            db.execSQL("DROP TABLE feed_items")
+            db.execSQL("ALTER TABLE feed_items_new RENAME TO feed_items")
+
+            // Correct indices
+            db.execSQL("CREATE INDEX index_feed_items_timeInMil ON feed_items(timeInMil)")
+            db.execSQL("CREATE INDEX index_feed_items_isSavedForLater ON feed_items(isSavedForLater)")
+            db.execSQL("CREATE INDEX index_feed_items_publishedAt ON feed_items(publishedAt)")
+        }
+    }
+
+
+    /*val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+
             // 1. Create final table (NO category)
             db.execSQL(
                 """
@@ -50,7 +94,7 @@ object DatabaseMigrations {
             db.execSQL("CREATE INDEX index_feed_items_isSavedForLater ON feed_items(isSavedForLater)")
             db.execSQL("CREATE INDEX index_feed_items_link ON feed_items(link)")
         }
-    }
+    }*/
 }
 
 
@@ -117,7 +161,7 @@ object DatabaseMigrations {
                 title, description, content, author, publishedAt,
                 imageUrl, link, savedDate, timeInMil, isSavedForLater
             )
-            SELECT 
+            SELECT
                 title, description, content, author, publishedAt,
                 imageUrl, link, savedDate, timeInMil, isSavedForLater
             FROM feed_items
