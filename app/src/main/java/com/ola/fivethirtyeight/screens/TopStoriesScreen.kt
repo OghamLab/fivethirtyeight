@@ -17,14 +17,7 @@ fun TopStoriesScreen(
 ) {
 
 
-
-
     val pagingItems = viewModel.topStoriesPaging.collectAsLazyPagingItems()
-
-
-
-
-
 
     val scroll = viewModel.scrollStateFor(SharedViewModel.FeedTab.TOP)
     val listState = rememberLazyListState(
@@ -42,16 +35,13 @@ fun TopStoriesScreen(
         },
         onRefresh =
             { pagingItems.refresh() },
-        cardContent = { item ->
+
+        cardContent = { item, index ->
             AnimatedFeedCard(item) { onArticleClick(item) }
-        },
+                      },
         shimmerContent = { ShimmerFeedCard() }
     )
 }
-
-
-
-
 
 
 /*

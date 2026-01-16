@@ -1,5 +1,7 @@
 package com.ola.fivethirtyeight.parser
 
+
+
 import com.ola.fivethirtyeight.model.FeedItem
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -13,7 +15,8 @@ private val RSS_DATE_FORMATS = listOf(
     "yyyy-MM-dd'T'HH:mm:ss'Z'",
     "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
 ).map {
-    SimpleDateFormat(it, Locale.ENGLISH).apply { isLenient = true } }
+    SimpleDateFormat(it, Locale.ENGLISH).apply { isLenient = true }
+}
 
 private fun parsePubDate(date: String): Long? {
     for (format in RSS_DATE_FORMATS) {
@@ -35,18 +38,15 @@ private fun isValidItem(
             link.startsWith("http") &&
             time > 0
 }
+
 private fun normalizeLink(link: String): String =
     link.substringBefore("?").trim()
 
- fun extractImage(element: Element): String {
+fun extractImage(element: Element): String {
     return element.getElementsByTag("media:thumbnail").first()?.attr("url")
         ?: element.getElementsByTag("media:content").first()?.attr("url")
         ?: element.select("enclosure[url]").attr("url")
 }
-
-
-
-
 
 
 fun parseRss(
@@ -86,7 +86,7 @@ fun parseRss(
                 publishedAt = pubDate,
                 imageUrl = image,
                 link = link,
-               savedDate = "",
+                savedDate = "",
                 timeInMil = timeInMil
             )
         )
@@ -96,4 +96,3 @@ fun parseRss(
         .distinctBy { it.link }
         .sortedByDescending { it.timeInMil }
 }
-

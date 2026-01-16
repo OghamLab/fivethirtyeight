@@ -1,462 +1,299 @@
 package com.ola.fivethirtyeight.screens
 
-import android.content.Context
-import android.content.Intent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.request.RequestListener
 import com.ola.fivethirtyeight.R
-import com.ola.fivethirtyeight.model.FeedCluster
 import com.ola.fivethirtyeight.model.FeedItem
 import com.ola.fivethirtyeight.utils.toRelativeTime
 import com.ola.fivethirtyeight.viewmodel.SharedViewModel
 
 
-@OptIn(ExperimentalGlideComposeApi::class)
-@Composable
-fun FeedCard(
-    item: FeedItem,
-    viewModel: SharedViewModel,
-    context: Context = LocalContext.current,
-    onClick: () -> Unit
-) {
-    var isVisible by remember { mutableStateOf(false) }
-
-    val animatedElevation by animateDpAsState(
-        targetValue = if (isVisible) 8.dp else 0.dp,
-        animationSpec = tween(durationMillis = 350),
-        label = ""
-    )
-
-    LaunchedEffect(Unit) { isVisible = true }
-
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(horizontal = 6.dp, vertical = 8.dp)
-            .clickable(onClick = onClick),
-        tonalElevation = animatedElevation,
-        shadowElevation = 4.dp,
-        shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, Color.LightGray),
-        color = MaterialTheme.colorScheme.tertiary
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-        ) {
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 56.dp) // space for icons
-            ) {
-
-                // If you want to re-enable image support later, this is ready.
-                /*
-                if (!item.imageUrl.isNullOrEmpty()) {
-                    GlideImage(
-                        modifier = Modifier
-                            .size(width = 120.dp, height = 100.dp)
-                            .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)),
-                        model = item.imageUrl,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        requestBuilderTransform = { rb ->
-                            rb.placeholder(R.drawable.loading_animation)
-                                .error(R.drawable.picsart)
-                                .transform(CenterCrop())
-                        }
-                    )
-                }
-                */
-
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 12.dp, vertical = 12.dp)
-                ) {
-
-                    Text(
-                        text = item.title,
-                        style = typography.titleMedium,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    if (!item.description.isNullOrEmpty()) {
-                        Spacer(Modifier.height(6.dp))
-                        Text(
-                            text = item.description,
-                            style = typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onTertiary,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Text(
-                        text = item.publishedAt.toRelativeTime(),
-                        style = typography.titleSmall,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                }
-            }
-
-            // Action icons
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(4.dp)
-            ) {
-
-                IconButton(onClick = {
-                    val sendIntent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, item.link)
-                        type = "text/plain"
-                    }
-                    context.startActivity(Intent.createChooser(sendIntent, "Share via"))
-                }) {
-                    Icon(Icons.Default.Share, contentDescription = "Share")
-                }
-
-                IconButton(onClick = {
-                    viewModel.toggleSave(item.link, false)
-                }) {
-                    Icon(Icons.Default.Delete, contentDescription = "Remove from saved")
-                }
-            }
-        }
-    }
-}
-
-
 sealed class FeedCardLayout {
-    data object LargeImageWithDesc : FeedCardLayout()
-    data object SmallImageOnly : FeedCardLayout()
-    data object DescriptionOnly : FeedCardLayout()
-    data object Empty : FeedCardLayout()
+    data object LargeImageTop : FeedCardLayout()
+    data object SmallImageRight : FeedCardLayout()
+    data object TextOnly : FeedCardLayout()
 }
-
 
 fun resolveLayout(item: FeedItem): FeedCardLayout {
-    val hasImage = !item.imageUrl.isNullOrEmpty() &&
-            !item.imageUrl.contains("default") &&
-            !item.imageUrl.contains("null")
-
-    val hasDesc = !item.description.isNullOrEmpty()
+    val hasImage = hasValidImage(item)
+    val hasDesc = !item.description.isNullOrBlank()
 
     return when {
-        hasImage && hasDesc -> FeedCardLayout.LargeImageWithDesc
-        hasImage && !hasDesc -> FeedCardLayout.SmallImageOnly
-        !hasImage && hasDesc -> FeedCardLayout.DescriptionOnly
-        else -> FeedCardLayout.Empty
+        hasImage && hasDesc -> FeedCardLayout.LargeImageTop
+        hasImage && !hasDesc -> FeedCardLayout.SmallImageRight
+        else -> FeedCardLayout.TextOnly
     }
 }
 
 
-@Composable
-fun FeedClusterCard(
-    cluster: FeedCluster,
-    onArticleClick: (FeedItem) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 6.dp, vertical = 8.dp)
-    ) {
-
-        // HERO CARD (main article)
-        FeedCardUniversal(
-            item = cluster.main,
-            isSaved = false,
-            onClick = { onArticleClick(cluster.main) }
-        )
-
-        // VARIANTS HEADER
-        if (cluster.variants.isNotEmpty()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expanded = !expanded }
-                    .padding(horizontal = 12.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = if (expanded) "Hide other sources" else "More sources",
-                    style = typography.titleSmall,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-                Icon(
-                    imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = null
-                )
-            }
-        }
-
-        // VARIANT LIST
-        AnimatedVisibility(expanded) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
-            ) {
-                cluster.variants.forEach { variant ->
-                    VariantRow(
-                        item = variant,
-                        onClick = { onArticleClick(variant) }
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun VariantRow(
-    item: FeedItem,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 6.dp)
-    ) {
-
-        // Source logo (optional future upgrade)
-        /* AsyncImage(
-            model = item.sourceLogo,
-            contentDescription = null,
-            modifier = Modifier
-                .size(20.dp)
-                .clip(CircleShape)
-        ) */
-
-        Column(modifier = Modifier.padding(start = 8.dp)) {
-            Text(
-                text = item.title,
-                style = typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Text(
-                text = item.publishedAt.toRelativeTime(),
-                style = typography.labelSmall,
-                color = MaterialTheme.colorScheme.secondary
-            )
-        }
-    }
-}
-
-
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun FeedCardUniversal(
     item: FeedItem,
-    isSaved: Boolean = false,
-    viewModel: SharedViewModel? = null,
     onClick: () -> Unit
 ) {
     val layout = remember(item) { resolveLayout(item) }
 
-    var isVisible by remember { mutableStateOf(false) }
-    val animatedElevation by animateDpAsState(
-        targetValue = if (isVisible) 8.dp else 0.dp,
-        animationSpec = tween(350),
-        label = ""
-    )
-    LaunchedEffect(Unit) { isVisible = true }
-
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(horizontal = 6.dp, vertical = 8.dp)
+            .padding(horizontal = 6.dp, vertical = 6.dp)
             .clickable(onClick = onClick),
-        tonalElevation = animatedElevation,
+        shape = RoundedCornerShape(1.dp),
+        tonalElevation = 4.dp,
         shadowElevation = 4.dp,
-        shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, Color.LightGray),
+
         color = MaterialTheme.colorScheme.tertiary
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        when (layout) {
+            FeedCardLayout.LargeImageTop -> FeedCardLargeImage(item)
+            FeedCardLayout.SmallImageRight -> FeedCardSmallImageRight(item)
+            FeedCardLayout.TextOnly -> FeedCardTextOnly(item)
+        }
+    }
+}
 
-            // IMAGE SECTION
-            when (layout) {
-                FeedCardLayout.LargeImageWithDesc,
-                FeedCardLayout.SmallImageOnly -> {
-                    GlideImage(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(if (layout is FeedCardLayout.LargeImageWithDesc) 260.dp else 120.dp)
-                            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
-                        model = item.imageUrl,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        requestBuilderTransform = { rb ->
-                            rb.placeholder(R.drawable.loading_animation)
-                                .error(R.drawable.picsart)
-                                .transform(CenterCrop())
-                        }
-                    )
-                }
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+private fun FeedCardLargeImage(
+    item: FeedItem
+) {
+    if (FeedImageFailureCache.hasFailed(item.link)) {
+        FeedCardTextOnly(item)
+        return
+    }
 
-                else -> Unit
-            }
+    val retryChain = remember(item.link) { item.imageRetryChain() }
 
-            // TEXT SECTION
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = item.title,
-                    style = typography.titleMedium,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+    if (retryChain.isEmpty()) {
+        FeedImageFailureCache.markFailed(item.link)
+        FeedCardTextOnly(item)
+        return
+    }
 
-                if (layout is FeedCardLayout.LargeImageWithDesc ||
-                    layout is FeedCardLayout.DescriptionOnly
-                ) {
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = item.description,
-                        style = typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onTertiary,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+    var attemptIndex by remember(item.link) { mutableStateOf(0) }
 
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = item.publishedAt.toRelativeTime(),
-                    style = typography.titleSmall,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
+    Column {
+        GlideImage(
+            model = retryChain.getOrNull(attemptIndex),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp),
+            contentScale = ContentScale.Crop,
+            alignment = Alignment.TopCenter,
+            requestBuilderTransform = { rb ->
+                rb.placeholder(R.drawable.loading_animation)
+                    .error(R.drawable.fivessss1) // ✅ WILL NOW SHOW
+                    .transform(CenterCrop())
+                    .listener(object : RequestListener<Drawable> {
 
-            // ACTIONS (only for saved items)
-            if (isSaved && viewModel != null) {
-                val context = LocalContext.current
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    IconButton(
-                        onClick = {
-                            val sendIntent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, item.link)
-                                type = "text/plain"
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: com.bumptech.glide.request.target.Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            return if (attemptIndex < retryChain.lastIndex) {
+                                attemptIndex++        // 🔁 retry
+                                true                  // ⛔ consume (no error drawable yet)
+                            } else {
+                                FeedImageFailureCache.markFailed(item.link)
+                                false                 // ✅ allow error drawable
                             }
-                            context.startActivity(
-                                Intent.createChooser(sendIntent, "Share via")
-                            )
                         }
-                    ) {
-                        Icon(Icons.Default.Share, contentDescription = "Share")
-                    }
 
-                    IconButton(
-                        onClick = {
-                            viewModel.toggleSave(item.link, false)
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: com.bumptech.glide.request.target.Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            return if (resource == null || !resource.isVisuallyValid()) {
+                                if (attemptIndex < retryChain.lastIndex) {
+                                    attemptIndex++
+                                    true               // retry
+                                } else {
+                                    FeedImageFailureCache.markFailed(item.link)
+                                    false              // show error drawable
+                                }
+                            } else {
+                                false
+                            }
                         }
-                    ) {
-                        Icon(Icons.Default.Delete, contentDescription = "Remove")
-                    }
-                }
+                    })
             }
+        )
 
+        if (FeedImageFailureCache.hasFailed(item.link)) {
+            FeedCardTextOnly(item)
+        } else {
+            FeedCardText(item)
         }
     }
 }
 
 
-/*@Composable
-fun FeedCardDispatcher(item: FeedItem, onArticleClick: (FeedItem) -> Unit) {
-    FeedCardUniversal(
-        item = item,
-        isSaved = false,
-        onClick = { onArticleClick(item) }
-    )
-}*/
-
-
-/*@Composable
-fun FeedCardDispatcher(
-    clusters: List<FeedCluster>,
-    onArticleClick: (FeedItem) -> Unit
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+private fun FeedCardSmallImageRight(
+    item: FeedItem
 ) {
-    LazyColumn {
-        items(clusters) { cluster ->
-            FeedClusterCard(cluster, onArticleClick)
-        }
+    // 🔒 If this link already failed → TextOnly
+    if (FeedImageFailureCache.hasFailed(item.link)) {
+        FeedCardTextOnly(item)
+        return
     }
-}*/
+
+    // 🔒 Cached failure → TextOnly
+    if (FeedImageFailureCache.hasFailed(item.link)) {
+        FeedCardTextOnly(item)
+        return
+    }
+
+    val retryChain = remember(item.link) { item.imageRetryChain() }
+    var attemptIndex by remember(item.link) { mutableStateOf(0) }
+
+    // 3️⃣ HARD GUARD: no usable image URLs
+    if (retryChain.isEmpty()) {
+        FeedImageFailureCache.markFailed(item.link)
+        FeedCardTextOnly(item)
+        return
+    }
+
+
+    // 1️⃣ Cached failure → TextOnly
+    if (FeedImageFailureCache.hasFailed(item.link)) {
+        FeedCardTextOnly(item)
+        return
+    }
+    Row(modifier = Modifier.padding(12.dp)) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 8.dp)
+        ) {
+            FeedCardText(
+                item = item,
+                maxDescLines = 2,
+                titleStyle = typography.titleMedium
+            )
+        }
+
+        GlideImage(
+            model = retryChain.getOrNull(attemptIndex),
+            contentDescription = null,
+            modifier = Modifier
+                .size(100.dp),
+              //  .clip(RoundedCornerShape(6.dp)),
+            contentScale = ContentScale.Crop,
+            requestBuilderTransform = { rb ->
+                rb.listener(object : RequestListener<Drawable> {
+
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: com.bumptech.glide.request.target.Target<Drawable?>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        if (attemptIndex < retryChain.lastIndex) {
+                            attemptIndex++ // 🔁 retry smaller variant
+                        } else {
+                            FeedImageFailureCache.markFailed(item.link)
+                        }
+                        return true // ⛔ we handled it
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: com.bumptech.glide.request.target.Target<Drawable?>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        if (resource == null || !resource.isVisuallyValid()) {
+                            // 🚫 NPR-style fake image
+                            FeedImageFailureCache.markFailed(item.link)
+                            return true
+                        }
+                        return false
+                    }
+                })
+            }
+        )
+
+    }
+}
+
+
+object FeedImageFailureCache {
+    private val failedLinks = mutableSetOf<String>()
+
+    fun hasFailed(link: String): Boolean = failedLinks.contains(link)
+
+    fun markFailed(link: String) {
+        failedLinks.add(link)
+    }
+}
+
+fun FeedItem.imageRetryChain(): List<String> =
+    buildList {
+        imageUrl?.let { add(it) }
+
+        // common RSS / CDN downscale patterns
+        imageUrl?.replace("original", "medium")?.let { add(it) }
+        imageUrl?.replace("large", "medium")?.let { add(it) }
+        imageUrl?.replace("large", "small")?.let { add(it) }
+    }.distinct()
+
+
+
+
+
+
+@Composable
+private fun FeedCardTextOnly(
+    item: FeedItem
+) {
+    FeedCardText(item)
+}
+
+
+
+
 @Composable
 fun FeedCardDispatcher(
     item: FeedItem,
@@ -464,23 +301,61 @@ fun FeedCardDispatcher(
 ) {
     FeedCardUniversal(
         item = item,
-        isSaved = false,
         onClick = { onArticleClick(item) }
     )
 }
 
-
 @Composable
-fun FeedClusterDispatcher(
-    clusters: List<FeedCluster>,
-    onArticleClick: (FeedItem) -> Unit
+private fun FeedCardText(
+    item: FeedItem,
+    maxDescLines: Int = 3,
+     titleStyle: TextStyle = typography.titleLarge.copy(fontSize = (24.sp * LocalDensity.current.fontScale))   // ⬅️ default
 ) {
-    LazyColumn {
-        items(clusters) { cluster ->
-            FeedClusterCard(cluster, onArticleClick)
+    Column(modifier = Modifier.padding(12.dp)) {
+
+        Text(
+            text = item.title,
+            style = titleStyle,
+            fontWeight = FontWeight.ExtraBold,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        if (item.description.isNotBlank()) {
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = item.description,
+                style = typography.bodyMedium,
+                maxLines = maxDescLines,
+                overflow = TextOverflow.Ellipsis
+            )
         }
+
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = item.publishedAt.toRelativeTime(),
+            color = MaterialTheme.colorScheme.secondary,
+            style = typography.titleSmall,
+            fontWeight = FontWeight.ExtraBold
+        )
     }
 }
+
+fun hasValidImage(item: FeedItem): Boolean =
+    !item.imageUrl.isNullOrBlank() &&
+            !item.imageUrl.contains("default", true) &&
+            !item.imageUrl.contains("null", true) &&
+            !item.imageUrl.contains("placeholder", true) &&
+            !item.imageUrl.contains("tracking", true) &&
+            !item.imageUrl.contains("spacer", true) &&
+            !item.imageUrl.contains("pixel", true) &&
+            !item.imageUrl.endsWith(".svg", true)
+
+
+//Detect visually empty images at render-time (critical)/
+fun Drawable.isVisuallyValid(): Boolean =
+    intrinsicWidth >= 40 && intrinsicHeight >= 40
 
 
 @Composable
@@ -491,28 +366,11 @@ fun FeedCardDispatcherSaved(
 ) {
     FeedCardUniversal(
         item = item,
-        isSaved = true,
-        viewModel = viewModel,
         onClick = { onArticleClick(item) }
     )
 }
 
 
 
-
-
-/*@Composable
-fun FeedCardDispatcherSaved(
-    item: FeedItem,
-    viewModel: SharedViewModel = hiltViewModel(),
-    onArticleClick: (FeedItem) -> Unit
-) {
-    FeedCardUniversal(
-        item = item,
-        isSaved = true,
-        viewModel = viewModel,
-        onClick = { onArticleClick(item) }
-    )
-}*/
 
 

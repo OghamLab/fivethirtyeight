@@ -23,14 +23,14 @@ interface FeedItemDao : BaseFeedDao<FeedItemEntity> {
     @Query("SELECT * FROM feed_items WHERE link = :link LIMIT 1")
     override fun getItemByLink(link: String): Flow<FeedItemEntity?>
 
-    @Query("SELECT * FROM feed_items WHERE isSavedForLater = 1 ORDER BY publishedAt DESC")
+    @Query("SELECT * FROM feed_items WHERE isSavedForLater = 1 ORDER BY timeInMil DESC")
     override fun getSavedItems(): Flow<List<FeedItemEntity>>
 
     /* ---------- Snapshots ---------- */
     @Query("SELECT * FROM feed_items ORDER BY timeInMil DESC")
     override suspend fun getAllItemsSorted(): List<FeedItemEntity>
 
-    @Query("SELECT * FROM feed_items WHERE isSavedForLater = 1 ORDER BY publishedAt DESC")
+    @Query("SELECT * FROM feed_items WHERE isSavedForLater = 1 ORDER BY timeInMil DESC")
     override suspend fun getSavedItemsOnce(): List<FeedItemEntity>
 
     /* ---------- Writes ---------- */

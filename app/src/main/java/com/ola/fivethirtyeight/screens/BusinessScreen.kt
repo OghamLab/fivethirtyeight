@@ -89,7 +89,7 @@ fun BusinessScreen(
                     val items = (feedState as ResourceState.Success).data
                     LazyColumn(state = listState) {
                         items(items, key = { it.link }) { item ->
-                            AnimatedFeedCard(item) {
+                            AnimatedFeedCard(item,) {
                                 onArticleClick(item)
                             }
                         }

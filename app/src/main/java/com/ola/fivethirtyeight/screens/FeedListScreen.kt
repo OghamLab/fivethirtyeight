@@ -13,6 +13,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import kotlinx.coroutines.launch
 
+
 @Composable
 fun <T : Any> FeedListScreen(
     pagingItems: LazyPagingItems<T>,
@@ -21,7 +22,7 @@ fun <T : Any> FeedListScreen(
     savedOffset: Int,
     onSaveScroll: (Int, Int) -> Unit,
     onRefresh: () -> Unit,
-    cardContent: @Composable (T) -> Unit,
+    cardContent: @Composable (item: T, index: Int) -> Unit,
     shimmerContent: @Composable () -> Unit
 ) {
     LaunchedEffect(Unit) {
@@ -50,6 +51,7 @@ fun <T : Any> FeedListScreen(
     val pullRefreshState = rememberPullToRefreshState()
     val scope = rememberCoroutineScope()
 
+
     PullToRefreshBox(
         state = pullRefreshState,
         isRefreshing = isRefreshing,
@@ -68,12 +70,24 @@ fun <T : Any> FeedListScreen(
         }
 
         LazyColumn(state = listState) {
+
+
             items(
                 count = pagingItems.itemCount,
                 key = { pagingItems[it]?.hashCode() ?: it }
+
+
             ) { index ->
-                pagingItems[index]?.let { cardContent(it) }
+
+
+                pagingItems[index]?.let { item ->
+                    cardContent(item, index) // ✅ index passed
+                }
             }
+
+
+
+
 
             when (pagingItems.loadState.append) {
                 is LoadState.Loading -> item { shimmerContent() }
@@ -85,6 +99,8 @@ fun <T : Any> FeedListScreen(
                 item { Text("Failed to load feed") }
             }
         }
+
+
     }
 }
 

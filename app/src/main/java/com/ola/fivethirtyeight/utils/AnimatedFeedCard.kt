@@ -8,12 +8,15 @@ import com.ola.fivethirtyeight.screens.FeedCardDispatcherSaved
 @Composable
 fun AnimatedFeedCard(
     item: FeedItem,
+
     onClick: (FeedItem) -> Unit
 ) {
-    FeedCardDispatcher(item = item, onArticleClick = {
+    FeedCardDispatcher(item = item,  onArticleClick = {
         onClick(it)
     })
 }
+
+
 
 
 
