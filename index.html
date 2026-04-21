@@ -1,171 +1,103 @@
 
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FiveThirtyEight App</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #fafafa;
-      color: #222;
-      line-height: 1.6;
-    }
-    header, footer {
-      background: #003366;
-      color: white;
-      text-align: center;
-      padding: 1.5rem;
-    }
-    main {
-      padding: 2rem;
-      max-width: 800px;
-      margin: auto;
-    }
-    h2 {
-      color: #003366;
-      margin-top: 1.5rem;
-    }
-    a { color: #0066cc; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <h1>FiveThirtyEight App</h1>
-    <p>Curating trustworthy data-driven journalism.</p>
-  </header>
 
-  <main>
-    <section id="about">
-      <h2>About</h2>
-      <p>
-        FiveThirtyEight App is a news aggregator app providing access to credible, data-based
-        journalism from verified sources such as FiveThirtyEight, ABC News, Yahoo News, and The New York Times.
-        We make complex stories accessible through visual storytelling and interactive insights.
-      </p>
-    </section>
-<section id="sources">
-  <h2>RSS Feed Sources</h2>
-  <p>This app aggregates publicly available RSS feeds from credible data journalism and news organizations:</p>
-  <ul>
-    <li>
-      <h3>Silver Bulletin</h3>
-      <a href="https://natesilver.substack.com/feed" target="_blank">https://natesilver.substack.com/feed</a>
-    </li>
+<header>
+  <h1>FiveThirtyEight App</h1>
+  <p>Curating trustworthy data-driven journalism.</p>
 
-    <li>
-      <h3>NPR</h3>
-      <a href="https://feeds.npr.org/1006/rss.xml" target="_blank">https://feeds.npr.org/1006/rss.xml</a><br>
-      <a href="https://feeds.npr.org/1007/rss.xml" target="_blank">https://feeds.npr.org/1007/rss.xml</a>
-      <a href="https://feeds.npr.org/1014/rss.xml" target="_blank">https://feeds.npr.org/1014/rss.xml</a>   
-    </li>
+  <nav>
+    <a href="/fivethirtyeight/index.html">Home</a>
+    <a href="/fivethirtyeight/about.html">About</a>
+    <a href="/fivethirtyeight/contact.html">Contact</a>
+    <a href="/fivethirtyeight/privacy.html">Privacy</a>
+    <a href="/fivethirtyeight/terms.html">Terms</a>
+  </nav>
+</header>
 
-    <li>
-      <h3>ABC News</h3>
-      <a href="https://abcnews.go.com/abcnews/topstories" target="_blank">https://abcnews.go.com/abcnews/topstories</a><br>
-      <a href="https://abcnews.go.com/abcnews/moneyheadlines" target="_blank">https://abcnews.go.com/abcnews/moneyheadlines</a><br>
-      <a href="https://abcnews.go.com/abcnews/healthheadlines" target="_blank">https://abcnews.go.com/abcnews/healthheadlines</a><br>
-      <a href="https://abcnews.go.com/abcnews/politicsheadlines" target="_blank">https://abcnews.go.com/abcnews/politicsheadlines</a>
-    </li>
+<main>
 
-    <li>
-      <h3>Yahoo News - Top Stories</h3>
-      <a href="https://www.yahoo.com/news/rss" target="_blank">https://www.yahoo.com/news/rss</a>
-    </li>
+  <section id="about">
+    <h2>About</h2>
+    <p>
+      FiveThirtyEight App is a news aggregator app providing access to credible, data-based
+      journalism from verified sources such as FiveThirtyEight, ABC News, Yahoo News, and The New York Times.
+      We make complex stories accessible through visual storytelling and interactive insights.
+    </p>
+  </section>
 
-    <li>
-      <h3>The New York Times</h3>
-      <a href="https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml" target="_blank">Technology</a><br>
-      <a href="https://rss.nytimes.com/services/xml/rss/nyt/YourMoney.xml" target="_blank">Your Money</a><br>
-      <a href="https://rss.nytimes.com/services/xml/rss/nyt/Health.xml" target="_blank">Health</a>
-      <a href="https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml" target="_blank">Politics</a>    
-    </li>
+  <section id="sources">
+    <h2>RSS Feed Sources</h2>
+    <p>This app aggregates publicly available RSS feeds from credible data journalism and news organizations:</p>
 
-    <li>
-      <h3>Reuters Graphics</h3>
-      <a href="https://www.reuters.com/rssFeed/graphics" target="_blank">https://www.reuters.com/rssFeed/graphics</a>
-    </li>
+    <ul>
+      <li>
+        <h3>Silver Bulletin</h3>
+        <a href="https://natesilver.substack.com/feed" target="_blank">https://natesilver.substack.com/feed</a>
+      </li>
 
-    <li>
-      <h3>The Guardian - Data</h3>
-      <a href="https://www.theguardian.com/data/rss" target="_blank">https://www.theguardian.com/data/rss</a>
-    </li>
+      <li>
+        <h3>NPR</h3>
+        <a href="https://feeds.npr.org/1006/rss.xml" target="_blank">https://feeds.npr.org/1006/rss.xml</a><br>
+        <a href="https://feeds.npr.org/1007/rss.xml" target="_blank">https://feeds.npr.org/1007/rss.xml</a><br>
+        <a href="https://feeds.npr.org/1014/rss.xml" target="_blank">https://feeds.npr.org/1014/rss.xml</a>
+      </li>
 
-    <li>
-      <h3>BBC News - World</h3>
-      <a href="https://feeds.bbci.co.uk/news/world/rss.xml" target="_blank">https://feeds.bbci.co.uk/news/world/rss.xml</a>
-    </li>
-  </ul>
-  <p>
-    These feeds are used strictly for public news aggregation and educational purposes.
-    The app does not modify or claim ownership of external content.
-  </p>
-</section>
-   
+      <li>
+        <h3>ABC News</h3>
+        <a href="https://abcnews.go.com/abcnews/topstories" target="_blank">Top Stories</a><br>
+        <a href="https://abcnews.go.com/abcnews/moneyheadlines" target="_blank">Money</a><br>
+        <a href="https://abcnews.go.com/abcnews/healthheadlines" target="_blank">Health</a><br>
+        <a href="https://abcnews.go.com/abcnews/politicsheadlines" target="_blank">Politics</a>
+      </li>
 
-    <section id="contact">
-      <h2>Contact Us</h2>
-      <p>Email: <a href="mailto:info.oghamlab@gmail.com">info.oghamlab@gmail.com</a></p>
-    </section>
+      <li>
+        <h3>Yahoo News - Top Stories</h3>
+        <a href="https://www.yahoo.com/news/rss" target="_blank">https://www.yahoo.com/news/rss</a>
+      </li>
 
-    <section id="privacy">
-      <h2>Privacy Policy</h2>
-      <p>
-        Ogham Lab built this app as a Free app. This SERVICE is provided by Ogham Lab at no cost and is intended for use as is.
-        This page is used to inform users regarding the policies with the collection, use, and disclosure of Personal Information
-        if anyone decided to use our Service. If you choose to use our Service, then you agree to the collection and use of
-        information in relation to this policy. NO PERSONAL INFORMATION IS COLLECTED at any time in using the app.
-      </p>
+      <li>
+        <h3>The New York Times</h3>
+        <a href="https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml" target="_blank">Technology</a><br>
+        <a href="https://rss.nytimes.com/services/xml/rss/nyt/YourMoney.xml" target="_blank">Your Money</a><br>
+        <a href="https://rss.nytimes.com/services/xml/rss/nyt/Health.xml" target="_blank">Health</a><br>
+        <a href="https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml" target="_blank">Politics</a>
+      </li>
 
-      <h4>Information Collected</h4>
-      <p>
-        While using our Service we do not collect any personally identifiable information. The app does use third-party services
-        that may collect information used to identify you. Reference to third-party service providers used by the app are below:
-      </p>
-      <p><a href="https://policies.google.com/privacy?hl=en">Google Play Services</a></p>
+      <li>
+        <h3>Reuters Graphics</h3>
+        <a href="https://www.reuters.com/rssFeed/graphics" target="_blank">https://www.reuters.com/rssFeed/graphics</a>
+      </li>
 
-      <h4>Log Data</h4>
-      <p>
-        We want to inform you that whenever you use our Service, in a case of an error in the app, data and information are logged
-        (through third-party products) on your phone called Log Data. This Log Data may include information such as your device
-        Internet Protocol (“IP”) address, device name, operating system version, the configuration of the app when utilizing our
-        Service, the time and date of your use of the Service, and other statistics.
-      </p>
+      <li>
+        <h3>The Guardian - Data</h3>
+        <a href="https://www.theguardian.com/data/rss" target="_blank">https://www.theguardian.com/data/rss</a>
+      </li>
 
-      <h4>Cookies</h4>
-      <p>
-        This Service does not use cookies explicitly. However, the app may use third-party code and libraries that use cookies
-        to collect information and improve their services.
-      </p>
+      <li>
+        <h3>BBC News - World</h3>
+        <a href="https://feeds.bbci.co.uk/news/world/rss.xml" target="_blank">https://feeds.bbci.co.uk/news/world/rss.xml</a>
+      </li>
+    </ul>
 
-      <h4>Links to Other Sites</h4>
-      <p>
-        This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site.
-        Note that these external sites are not operated by us. Therefore, we strongly advise you to review the Privacy Policy
-        of these websites. We have no control over and assume no responsibility for the content, privacy policies, or practices
-        of any third-party sites or services.
-      </p>
+    <p>
+      These feeds are used strictly for public news aggregation and educational purposes.
+      The app does not modify or claim ownership of external content.
+    </p>
+  </section>
 
-      <h4>Children's Policy</h4>
-      <p>
-        These Services do not address anyone under the age of 13. We do not collect personally identifiable information from
-        children under 13. However, third-party links or sites may collect personally identifiable information.
-      </p>
+</main>
 
-      <h4>Changes to this Privacy Policy</h4>
-      <p>
-        We may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes.
-        We will notify you of any changes by posting the new Privacy Policy on this page.
-      </p>
-    </section>
-  </main>
+<footer>
+  <p>© 2026 Ogham Lab. All Rights Reserved.</p>
+</footer>
 
-  <footer>
-   
-    <p>© 2025 Ogham Lab. All Rights Reserved.</p>
-  </footer>
 </body>
 </html>
