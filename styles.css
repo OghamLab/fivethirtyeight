@@ -5,30 +5,52 @@ body {
   color: #222;
   line-height: 1.6;
 }
+
 header, footer {
   background: #003366;
   color: white;
   text-align: center;
   padding: 1.5rem;
 }
+
+nav {
+  margin-top: 1rem;
+}
+
+nav a {
+  color: white;
+  margin: 0 10px;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+
+nav a:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+nav a.active {
+  background: white;
+  color: #003366;
+  font-weight: bold;
+}
+
 main {
   padding: 2rem;
   max-width: 800px;
   margin: auto;
 }
+
 h1, h2 {
   color: #003366;
 }
-a { color: #0066cc; text-decoration: none; }
-a:hover { text-decoration: underline; }
-nav {
-  margin-top: 1rem;
-}
-nav a {
-  color: white;
-  margin: 0 10px;
+
+a {
+  color: #0066cc;
   text-decoration: none;
 }
-nav a:hover {
+
+a:hover {
   text-decoration: underline;
 }
+
